@@ -225,66 +225,76 @@ Beachten Sie:
   Detector](...) daemon nutzen, können Sie die die Gesundheit Ihrer Nodes
   sicherstellen.
 
-## Production user management
+## Nutzerverwaltung in Produktionsumgebungen
 
-In production, you may be moving from a model where you or a small group of
-people are accessing the cluster to where there may potentially be dozens or
-hundreds of people. In a learning environment or platform prototype, you might have a single
-administrative account for everything you do. In production, you will want
-more accounts with different levels of access to different namespaces.
+In einer Produktionsumgebung wechseln Sie möglicherweise von einem Modell,
+in dem nur Sie oder eine kleine Gruppe von Personen auf den Cluster zugreifen,
+hin zu einem Szenario, in dem potenziell Dutzende oder Hunderte von Personen Zugriff haben.
+Für eine Lernumgebung oder einen Plattform Prototypen haben Sie unter Umständen
+einen einzigen Administrator Benutzer, welcher Vollzugriff hat. Für Ihre
+Produktwivumgebung werden Sie mehr Benutzer mit unterschiedlichen Zugriffsleveln
+haben wollen.
 
-Taking on a production-quality cluster means deciding how you
-want to selectively allow access by other users. In particular, you need to
-select strategies for validating the identities of those who try to access your
-cluster (authentication) and deciding if they have permissions to do what they
-are asking (authorization):
+Einen produktionsreifen Cluster zu betreiben heißt, selektiv Zugriff auf den
+Cluster durch weitere Nutzer zuzulassen. Im Detail bedeutet dies, dass Sie
+die Strategie wählen müssen, für jene, die auf Ihren Cluster zugreifen wollen
+(Authentifizierung), und ob diese das Recht haben, auf angefragte Ressourcen
+zuzugreifen (Autorisierung).
 
-- *Authentication*: The apiserver can authenticate users using client
-  certificates, bearer tokens, an authenticating proxy, or HTTP basic auth.
-  You can choose which authentication methods you want to use.
-  Using plugins, the apiserver can leverage your organization’s existing
-  authentication methods, such as LDAP or Kerberos. See
-  [Authentication](/docs/reference/access-authn-authz/authentication/)
-  for a description of these different methods of authenticating Kubernetes users.
-- *Authorization*: When you set out to authorize your regular users, you will probably choose
-  between RBAC and ABAC authorization. See [Authorization Overview](/docs/reference/access-authn-authz/authorization/)
-  to review different modes for authorizing user accounts (as well as service account access to
-  your cluster):
-  - *Role-based access control* ([RBAC](/docs/reference/access-authn-authz/rbac/)): Lets you
-    assign access to your cluster by allowing specific sets of permissions to authenticated users.
-    Permissions can be assigned for a specific namespace (Role) or across the entire cluster
-    (ClusterRole). Then using RoleBindings and ClusterRoleBindings, those permissions can be attached
-    to particular users.
-  - *Attribute-based access control* ([ABAC](/docs/reference/access-authn-authz/abac/)): Lets you
-    create policies based on resource attributes in the cluster and will allow or deny access
-    based on those attributes. Each line of a policy file identifies versioning properties (apiVersion
-    and kind) and a map of spec properties to match the subject (user or group), resource property,
-    non-resource property (/version or /apis), and readonly. See
-    [Examples](/docs/reference/access-authn-authz/abac/#examples) for details.
+- *Authentifizierung*: Der API-Server kann Clients mithilfe von Zertifikaten,
+  Bearer-Tokens, einem Authentifizierungsproxy oder HTTP Basic Auth
+  authentifizieren. Sie können die Methoden wählen. Mithilfe von Plugins kann
+  der API-Server bestehende Authentifizerungsmethoden Ihrer Organization nutzen,
+  wie zum Beispiel LDAP oder Kerberos. Schauen Sie in 
+  [Authentication](/docs/reference/access-authn-authz/authentication/) für eine
+  Beschreibung der verschiedenen Methoden zur Authentizifierung von Kubernetes
+  Nutzern.
+- *Autorisierung*: Falls Sie darauf abzielen, ihre normalen Nutzer zu
+  autorisieren, werden Sie wahrscheinlich zwischen RBAC und ABAC Autorisierung wählen.
+  Sehen sie in der [Übersicht zur Autorisierung](/docs/reference/access-authn-authz/authorization/)
+  die unterschiedlichen Modi zur Autorisierung von Nutzerkonten durch (als auch von Service Account
+  Zugriff auf Ihren Cluster):
+  - *Rolenbasierte Zugriffskontrolle* ([RBAC](/docs/reference/access-authn-authz/rbac/)) 
+    lässt Sie Clusterzugriff durch die Freigabe bestimmter Rechte an
+    authentifizerte Nutzer verwalten. Rechte können für einen bestimmten
+    Namespace (Role) oder für den gesamten Cluster (ClusterRole) zugewiesen
+    werden. Durch die Nutzung von RoleBindings und ClusterRoleBindings können
+    diese an bestimmte Nutzer vergeben werden.
+  - *Attributbasierte Zugriffkontrolle* ([ABAC](/docs/reference/access-authn-authz/abac/)) 
+    lässt sie Richtlinien anhand der Attribute von Ressourcen erstellen, und
+    erlaubt oder verweigert Zugriff basierend auf diesen Attributen. Jede Zeile
+    einer Policy-Datei beinhaltet Versionsinformationen (apiVersion und kind),
+    sowie eine Map von spec-Eigenschaften, um das Subject (Nutzer oder Gruppe), 
+    Ressourcen Eigenschaften, nicht-Ressourcen Eigenschaften (/version oder /api) und
+    die Eigenschaft readonly zu verbinden. Sehen Sie in den 
+    [Beispielen](/docs/reference/access-authn-authz/abac/#examples) für die Details nach. 
 
-As someone setting up authentication and authorization on your production Kubernetes cluster, here are some things to consider:
+Als Jemand, der einen produktionsreifen Kubernetes Cluster aufsetzt, sollten Sie
+einige Dinge beachten:
 
-- *Set the authorization mode*: When the Kubernetes API server
-  ([kube-apiserver](/docs/reference/command-line-tools-reference/kube-apiserver/))
-  starts, supported authorization modes must be set using an *--authorization-config* file or the *--authorization-mode*
-  flag. For example, that flag in the *kube-adminserver.yaml* file (in */etc/kubernetes/manifests*)
-  could be set to Node,RBAC. This would allow Node and RBAC authorization for authenticated requests.
-- *Create user certificates and role bindings (RBAC)*: If you are using RBAC
-  authorization, users can create a CertificateSigningRequest (CSR) that can be
-  signed by the cluster CA. Then you can bind Roles and ClusterRoles to each user.
-  See [Certificate Signing Requests](/docs/reference/access-authn-authz/certificate-signing-requests/)
-  for details.
-- *Create policies that combine attributes (ABAC)*: If you are using ABAC
-  authorization, you can assign combinations of attributes to form policies to
-  authorize selected users or groups to access particular resources (such as a
-  pod), namespace, or apiGroup. For more information, see
-  [Examples](/docs/reference/access-authn-authz/abac/#examples).
-- *Consider Admission Controllers*: Additional forms of authorization for
-  requests that can come in through the API server include
+- *Setzen Sie den Autorisierungsmodus*: Sobald der Kubernetes API-Server startet,
+  müssen unterstützte Autorisierungsmodi gesetzt sein, entweder durch eine
+  *--authorization-config* Datei oder ein *--authorization-mode* Flag. Zum
+  Beispiel können Sie das Flag in *kube-adminserver.yaml* (in
+  */etc/kubernetes/manifests*) zu Node,RBAC setzen, was Node und RBAC
+  Autorisierungsanfragen für authentifizierte Anfragen erlabut.
+- *Erstellen Sie Nutzerzertifikate und Role Bindings (RBAC)*: Wenn Sie RBAC
+  Autorisierung nutzen, können Nutzer eine CertificateSigningRequest (CSR)
+  erstellen, das von der Cluster CA signiert werden kann. Daraufhin können Role und
+  ClusterRole an an jeden Nutzer gebunden werden. 
+  Die Details finden Sie in 
+  [Certificate Signing Requests](/docs/reference/access-authn-authz/certificate-signing-requests/)
+- *Erstellen Sie Richtlinien die Attribute vereinen (ABAC)*: Falls Sie ABAC
+  Autorisierung nutzen, können Sie Kombinationen von Attributen zu Richtlinien
+  vereinen, sodass ausgewählte Gruppen oder Nutzer für Zugriff auf bestimmte
+  Ressourcen (wie z. B. Pod), Namespaces oder API Gruppen autorisiert werden. 
+  Mehr dazu finden Sie in den [Beispielen](/docs/reference/access-authn-authz/abac/#examples).
+TODO
+- *Ziehen Sie Admission Controller in Betracht*: Zusätzliche Methoden zur
+  Autorisierung von Anfragen, die durch den API-Server eingehen, beinhalten
   [Webhook Token Authentication](/docs/reference/access-authn-authz/authentication/#webhook-token-authentication).
-  Webhooks and other special authorization types need to be enabled by adding
-  [Admission Controllers](/docs/reference/access-authn-authz/admission-controllers/)
-  to the API server.
+  Webhooks und weitere spezielle Autorisierungstypen müssen aktiviert werden durch
+  [Admission Controller](/docs/reference/access-authn-authz/admission-controllers/)
 
 ## Set limits on workload resources
 
