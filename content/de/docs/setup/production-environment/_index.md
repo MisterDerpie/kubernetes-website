@@ -20,8 +20,8 @@ Sie direkt zu [Nächste Schritte](#nächste-schritte) springen.
 ## Production considerations
 
 Ein Kubernetes Cluster in einer Produktionsumgebung hat üblicherweise höhere
-Anforderungen als ein eigener Cluster zum Lernen, oder Cluster in einer
-Entwicklungsumbebung oder einer Testumgebung. Eine Produktionsumgebung benötigt 
+Anforderungen als ein eigener Cluster zum Lernen, Cluster in einer
+Entwicklungsumbebung oder Cluster in einer Testumgebung. Eine Produktionsumgebung benötigt 
 möglicherweise sicheren Zugriff bei vielen Nutzern, konstante Verfügbarkeit, 
 und die Ressourcen um sich ändernden Anforderungen gerecht zu werden. 
 
@@ -40,11 +40,11 @@ werden:
   - Genügend Worker-Nodes sind verfügbar, oder können schnell bereitgestellt werden, wenn der Bedarf sich ändert.
 
 - *Skalierbarkeit*: Wenn Sie eine gleichbleibende Last auf Ihrem Cluster
-erwarten, können Sie die Ressourcen für ausreichende Kapazität aufsetzen und
-sind fertig. Falls Sie jedoch erwarten, dass der Bedarf an Ressourcen über die
-Zeit zunimmt, oder sich je nach Saison, oder durch bestimmte Ereignisse
-verändert, benötigen Sie das Vorausplanen, wie Sie skalieren. Das ist notwendig, um die Control-Plane 
-und Worker-Nodes zu entlasten, oder zum Runterskalieren von nicht benötigten Ressourcen.
+  erwarten, können Sie die Ressourcen für ausreichende Kapazität aufsetzen und
+  sind fertig. Falls Sie jedoch erwarten, dass der Bedarf an Ressourcen über die
+  Zeit zunimmt, oder sich je nach Saison, oder durch bestimmte Ereignisse
+  verändert, benötigen Sie das Vorausplanen, wie Sie skalieren. Das ist notwendig, um die Control-Plane 
+  und Worker-Nodes zu entlasten, oder zum Runterskalieren von nicht benötigten Ressourcen.
 
 - *Sicherheit und Zugriffskontrolle*: Sie haben Vollzugriff auf Ihren eigenen
   Cluster in einer Lernumgebung. Kubernetes Cluster mit mehr als ein, zwei Nutzern
@@ -148,69 +148,82 @@ nachfolgenden Schritte:
   Der Scheduler sollte fehlertolerant sein, muss jedoch nicht hochverfügbar
   sein. Manche Deployment Tools setzen den [Raft](https://raft.github.io/)
   Konsensalgorithmus auf, für die Wahl des Leaders für Kubernetes Dienste. Falls der
-  gewählte Leader verschwindet, wird ein anderer Dienst gewählt und übernimmt.
-
-
-- *Span multiple zones*: If keeping your cluster available at all times is
-  critical, consider creating a cluster that runs across multiple data centers,
-  referred to as zones in cloud environments. Groups of zones are referred to as regions.
-  By spreading a cluster across
-  multiple zones in the same region, it can improve the chances that your
-  cluster will continue to function even if one zone becomes unavailable.
-  See [Running in multiple zones](/docs/setup/best-practices/multiple-zones/) for details.
-- *Manage on-going features*: If you plan to keep your cluster over time,
-  there are tasks you need to do to maintain its health and security. For example,
-  if you installed with kubeadm, there are instructions to help you with
-  [Certificate Management](/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
-  and [Upgrading kubeadm clusters](/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/).
-  See [Administer a Cluster](/docs/tasks/administer-cluster/)
-  for a longer list of Kubernetes administrative tasks.
+  gewählte Leader wegfällt, wählt ein anderer Dienst sich selbst und übernimmt.
+- *Verteilung über mehrere Zonen*: Falls Ihr Cluster unbedingt immer verfügbar
+  sein muss, sollten Sie in Betracht ziehen, diesen in mehreren Datenzentren zu
+  verteilen, welche im Cloud Computing als Zonen genannt werden.
+  Zusammenschlüsse von Zonen bezeichnet man als Regionen. Durch die Verteilung von
+  Clustern über mehrere Zonen in der gleichen Region werden die Chancen erhöht,
+  dass Ihr Cluster verfügbar bleibt, sofern eine Zone ausfällt. Sehen Sie auch 
+  [Operieren in mehreren Zonen](/docs/setup/best-practices/multiple-zones/) für
+  weitere Informationen.
+- *Anfallende Aufgaben*: Falls Sie planen Ihren Cluster für längere Zeit zu
+  behalten, fallen verschiedene Aufgaben an, um den Zustand und die Sicherheit des
+  Clusters zu gewährleisten. Sollten Sie zum Beispiel Ihren Cluster mit kubeadm
+  installiert haben, finden Sie hier Anlteitungen zur 
+  [Zertifikatverwaltung](/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
+  und zum [kubeadm Cluster upgraden](/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/).
 
 To learn about available options when you run control plane services, see
-[kube-apiserver](/docs/reference/command-line-tools-reference/kube-apiserver/),
-[kube-controller-manager](/docs/reference/command-line-tools-reference/kube-controller-manager/),
-and [kube-scheduler](/docs/reference/command-line-tools-reference/kube-scheduler/)
-component pages. For highly available control plane examples, see
 [Options for Highly Available topology](/docs/setup/production-environment/tools/kubeadm/ha-topology/),
 [Creating Highly Available clusters with kubeadm](/docs/setup/production-environment/tools/kubeadm/high-availability/),
 and [Operating etcd clusters for Kubernetes](/docs/tasks/administer-cluster/configure-upgrade-etcd/).
 See [Backing up an etcd cluster](/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster)
 for information on making an etcd backup plan.
 
+???? Next is ... I had a hard time translating, TODO
+
+Um die Möglichkeiten für Control-Plane Dienste zu sehen, siehe
+[kube-apiserver](/docs/reference/command-line-tools-reference/kube-apiserver/),
+[kube-controller-manager](/docs/reference/command-line-tools-reference/kube-controller-manager/),
+und [kube-scheduler](/docs/reference/command-line-tools-reference/kube-scheduler/)
+Komponentenseiten. Für hochverfügbare Control-Plane Beispiele, sehen Sie in 
+[Hochverfügbare Cluster mit kubeadm erstellen](/docs/setup/production-environment/tools/kubeadm/high-availability/),
+und [etcd Cluster für Kubernetes verwalten](/docs/tasks/administer-cluster/configure-upgrade-etcd/) nach.
+Lesn Sie [Backup eines etcd Clustes erstellen](/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster)
+für mehr Informationen über einen etcd Backup Plan.
+
 ### Worker-Nodes in einer Produktionsumgebung
+### Produktionsreife Worker-Nodes
 ### Production worker nodes
 
-Production-quality workloads need to be resilient and anything they rely
-on needs to be resilient (such as CoreDNS). Whether you manage your own
-control plane or have a cloud provider do it for you, you still need to
-consider how you want to manage your worker nodes (also referred to
-simply as *nodes*).  
+Produktionsreife Workloads müssen resilient sein, und ihre Abhängigkeiten
+ebenfalls (wie z. B. CoreDNS). Unabhängig davon ob Sie Ihre Control-Plane selbst
+verwalten, oder dies einem Cloud Anbieter überlassen, müssen Sie in Betracht
+ziehen, wie Sie ihre Worker-Nodes verwalten (diese werden oft kürzer als *nodes*
+referenziert). 
 
-- *Configure nodes*: Nodes can be physical or virtual machines. If you want to
-  create and manage your own nodes, you can install a supported operating system,
-  then add and run the appropriate
-  [Node services](/docs/concepts/architecture/#node-components). Consider:
-  - The demands of your workloads when you set up nodes by having appropriate memory, CPU, and disk speed and storage capacity available.
-  - Whether generic computer systems will do or you have workloads that need GPU processors, Windows nodes, or VM isolation.
-- *Validate nodes*: See [Valid node setup](/docs/setup/best-practices/node-conformance/)
-  for information on how to ensure that a node meets the requirements to join
-  a Kubernetes cluster.
-- *Add nodes to the cluster*: If you are managing your own cluster you can
-  add nodes by setting up your own machines and either adding them manually or
-  having them register themselves to the cluster’s apiserver. See the
-  [Nodes](/docs/concepts/architecture/nodes/) section for information on how to set up Kubernetes to add nodes in these ways.
-- *Scale nodes*: Have a plan for expanding the capacity your cluster will
-  eventually need. See [Considerations for large clusters](/docs/setup/best-practices/cluster-large/)
-  to help determine how many nodes you need, based on the number of pods and
-  containers you need to run. If you are managing nodes yourself, this can mean
-  purchasing and installing your own physical equipment.
-- *Autoscale nodes*: Read [Node Autoscaling](/docs/concepts/cluster-administration/node-autoscaling) to learn about the
-  tools available to automatically manage your nodes and the capacity they
-  provide.
-- *Set up node health checks*: For important workloads, you want to make sure
-  that the nodes and pods running on those nodes are healthy. Using the
-  [Node Problem Detector](/docs/tasks/debug/debug-cluster/monitor-node-health/)
-  daemon, you can ensure your nodes are healthy.
+- *Nodes konfigurieren*: Nodes können physische oder virtuelle Maschinen sein.
+Falls Sie Ihre eigenen Nodes erstellen und verwalten wollen, können Sie ein
+unterstütztes Betriebssystem installieren und die korrekten 
+[Node Dienste](./docs/concepts/architecture/#node-components) ausführen.
+Beachten Sie:
+  - Die Anforderungen Ihrer Workloads beim Aufsetzen Ihrer Nodes, sodass diese
+  die korrekten CPU, Speicher, Festplattengeschwindigkeit sowie -kapazität
+  haben. 
+  - Ob generische Computersysteme ausreichen, oder Sie Workloads haben, welche
+  GPUs, Windows Nodes oder VM Isolation benötigen.
+- *Nodes validieren*: Sehen Sie unter [Korrektes Node Setup](/docs/setup/best-practices/node-conformance/)
+  für Informationen zur Sicherstellung, dass Ihre Nodes die Anforderungen für
+  einen Beitritt zum Cluster erfüllen, nach.
+- *Nodes zum Cluster hinzufügen*: Falls Sie Ihren eigenen Clsuter verwalten,
+  können Sie Nodes hinzufügen, indem Sie Ihre eigenen Maschinen aufsetzen und
+  diese entweder manuell hinzufügen, oder sich selbst am API Server des Clusters
+  registrieren lassen. Lesen Sie dafür in dem Abschnitt [Nodes](/docs/concepts/architecture/nodes/)
+  nach, wie Sie Kubernetes aufsetzen, um Nodes in den vorangegangen Möglichkeiten
+  hinzuzufügen.
+- *Nodes skalieren*: Halten Sie einen Plan bereit, die Kapazität des Clusters zu
+  erweitern. Sehen Sie in [TODO Considerations for large clusters](/docs/setup/best-practices/cluster-large/)
+  nach, um herauszufinden wie viele Nodes Sie benötigen, basierend auf der
+  Anzahl der Pods und Container die laufen. Falls Sie Ihre Nodes selbst verwalten,
+  kann dies den Kauf und die Installation Ihrer eigenen Hardware umfassen.
+- *Knoten automatisch skalieren*: Lesen Sie [Node Autoscaling](/docs/concepts/cluster-administration/node-autoscaling)
+  um über die Tools zu erfahren, welche Ihnen die Möglichkeit zur
+  Automatisierung Ihrer Knoten und derer Kapazitäten bieten. 
+- *Setzen Sie Node Health Checks auf*: Für kritische Workloads wollen Sie
+  sicherstellen, dass die Nodes und Pods gesund sind. Wenn Sie den [Node Problem
+  Detector](...) daemon nutzen, können Sie die die Gesundheit Ihrer Nodes
+  sicherstellen.
 
 ## Production user management
 
