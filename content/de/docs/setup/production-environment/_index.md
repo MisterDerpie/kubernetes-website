@@ -297,47 +297,55 @@ TODO
   [Admission Controller](/docs/reference/access-authn-authz/admission-controllers/)
 
 ## Set limits on workload resources
+## Setzen von Limits für Workloads 
 
-Demands from production workloads can cause pressure both inside and outside
-of the Kubernetes control plane. Consider these items when setting up for the
-needs of your cluster's workloads:
+Anforderungen von Workloads in der Produktion kann Systemlast sowohl in als auch
+außerhalb der Kubernetes Control-Plane erzeugen. Beachten Sie diese Punkte beim
+Aufsetzen Ihres Clusters zum Erfüllen der Anforderungen der Workloads:
 
-- *Set namespace limits*: Set per-namespace quotas on things like memory and CPU. See
-  [Manage Memory, CPU, and API Resources](/docs/tasks/administer-cluster/manage-resources/)
-  for details.
-- *Prepare for DNS demand*: If you expect workloads to massively scale up,
-  your DNS service must be ready to scale up as well. See
-  [Autoscale the DNS service in a Cluster](/docs/tasks/administer-cluster/dns-horizontal-autoscaling/).
-- *Create additional service accounts*: User accounts determine what users can
-  do on a cluster, while a service account defines pod access within a particular
-  namespace. By default, a pod takes on the default service account from its namespace.
-  See [Managing Service Accounts](/docs/reference/access-authn-authz/service-accounts-admin/)
-  for information on creating a new service account. For example, you might want to:
+- *Setzen Sie namespace limits*: Setzen Sie pro-namespace Kontingente für
+  Ressourcen wie Arbeitsspeicher und CPU. Unter [Verwalten von Speicher, CPU und
+  API Ressourcen](./docs/tasks/administer-cluster/manage-resources) finden Sie mehr dazu.
+- *Vorbereiten für DNS Anforderungen*: Falls Sie planen Ihre Worklodas massiv zu
+  skalieren, muss Ihr DNS Service auch für diese Skalierbarkeit bereit sein. Für
+  mehr, lesen Sie in 
+  [DNS Service automatisch in einem Cluster skalieren](/docs/tasks/administer-cluster/dns-horizontal-autoscaling/).
+- *Erstellen Sie zusätzliche Service Accounts*: Nutzeraccounts definieren, was
+  Nutzer in einem Cluster tun können, wogegen Service Accounts zur Definition von
+  Zugrifssrechten der Pods in einem Namespace genutzt werden. Standardmäßig nimmt
+  ein Pod den Standard Service Account seines Namespaces an. Für mehr
+  Informationen zum Erstellen eines neuen Service Accounts, lesen Sie [Verwalten
+  von Service Accounts](/docs/reference/access-authn-authz/service-accounts-admin/). 
+  Beispielsweise könnten Sie:
   - Add secrets that a pod could use to pull images from a particular container registry. See
-    [Configure Service Accounts for Pods](/docs/tasks/configure-pod-container/configure-service-account/)
+    [Configure Service Accounts for Pods]()
     for an example.
-  - Assign RBAC permissions to a service account. See
-    [ServiceAccount permissions](/docs/reference/access-authn-authz/rbac/#service-account-permissions)
-    for details.
+  - Secrets hinzufügen, sodass ein Pod sein Image von einer bestimmten Container
+    Registry pullen kann. Sehen Sie dazu in [Verwalten von Service Accounts für
+    Pods](/docs/tasks/configure-pod-container/configure-service-account/) für ein
+    Beispiel nach.
+  - RBAC Rechte an einen Service Account binden. Details finden Sie in
+    [ServiceAccount Rechte](/docs/reference/access-authn-authz/rbac/#service-account-permissions).
 
 ## {{% heading "whatsnext" %}}
 
-- Decide if you want to build your own production Kubernetes or obtain one from
-  available [Turnkey Cloud Solutions](/docs/setup/production-environment/turnkey-solutions/)
-  or [Kubernetes Partners](/partners/).
-- If you choose to build your own cluster, plan how you want to
-  handle [certificates](/docs/setup/best-practices/certificates/)
-  and set up high availability for features such as
+- Entscheiden Sie, ob Sie Ihren eigenen Kubernetes Cluster erstellen,
+  oder einen von verfügbaren [Turnkey Cloud Solutions](/docs/setup/production-environment/turnkey-solutions/)
+  oder [Kubernetes Partnern](/partners) erhalten wollen.
+- Falls Sie Ihren eigenen Cluster erstellen, planen Sie wie sie 
+  [Zertifikiate](/docs/setup/best-practices/certificates/)
+  verwalten, und hohe Verfügbarkeit für Features wie 
   [etcd](/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/)
-  and the
+  und den 
   [API server](/docs/setup/production-environment/tools/kubeadm/ha-topology/).
-- Choose from [kubeadm](/docs/setup/production-environment/tools/kubeadm/),
-  [kops](https://kops.sigs.k8s.io/) or
-  [Kubespray](https://kubespray.io/) deployment methods.
-- Configure user management by determining your
-  [Authentication](/docs/reference/access-authn-authz/authentication/) and
-  [Authorization](/docs/reference/access-authn-authz/authorization/) methods.
-- Prepare for application workloads by setting up
-  [resource limits](/docs/tasks/administer-cluster/manage-resources/),
+  aufsetzen.
+- Wählen Sie zwischen [kubeadm](/docs/setup/production-environment/tools/kubeadm/),
+  [kops](https://kops.sigs.k8s.io/) oder
+  [Kubespray](https://kubespray.io/) als Deployment Methoden.
+- Konfigurieren Sie Nutzerverwaltung durch Auswahl Ihrer Methoden zur 
+  [Authentifizierung](/docs/reference/access-authn-authz/authentication/) und 
+  [Autorisierung](/docs/reference/access-authn-authz/authorization/).
+- Bereiten Sie sich auf die Worklodas Ihrer Anwendungen durch das Aufsetzen von
+  [Ressourcenlimits](/docs/tasks/administer-cluster/manage-resources/),
   [DNS autoscaling](/docs/tasks/administer-cluster/dns-horizontal-autoscaling/)
-  and [service accounts](/docs/reference/access-authn-authz/service-accounts-admin/).
+  und [service accounts](/docs/reference/access-authn-authz/service-accounts-admin/) vor.
