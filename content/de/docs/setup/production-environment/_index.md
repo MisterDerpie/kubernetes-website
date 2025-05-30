@@ -7,8 +7,7 @@ no_list: true
 
 <!-- overview -->
 
-Ein produktionsreifer Kubernetes Cluster benötigt Planung und
-Vorbereitung.
+Ein produktionsreifer Kubernetes Cluster benötigt Planung und Vorbereitung.
 Sofern Ihr Kubernetes Cluster kritische Workloads verrichtet, muss er ausfallsicher konfiguriert sein.
 Diese Seite zeigt Ihnen Schritte, um einen produnktionsreifen Cluster aufzusetzen 
 oder um einen bestehenen Cluster produktionsreif zu machen.
@@ -17,12 +16,12 @@ Sie direkt zu [Nächste Schritte](#nächste-schritte) springen.
 
 <!-- body -->
 
-## Production considerations
+## Betrachtungen für den Proudktiveinsatz
 
 Ein Kubernetes Cluster in einer Produktionsumgebung hat üblicherweise höhere
 Anforderungen als ein eigener Cluster zum Lernen, Cluster in einer
 Entwicklungsumbebung oder Cluster in einer Testumgebung. Eine Produktionsumgebung benötigt 
-möglicherweise sicheren Zugriff bei vielen Nutzern, konstante Verfügbarkeit, 
+möglicherweise sicheren Zugriff mit vielen Nutzern, konstante Verfügbarkeit, 
 und die Ressourcen um sich ändernden Anforderungen gerecht zu werden. 
 
 Da Sie entscheiden wie Sie Ihre Kubernetes Umgebung hosten (On-Premise oder in
@@ -42,16 +41,16 @@ werden:
 - *Skalierbarkeit*: Wenn Sie eine gleichbleibende Last auf Ihrem Cluster
   erwarten, können Sie die Ressourcen für ausreichende Kapazität aufsetzen und
   sind fertig. Falls Sie jedoch erwarten, dass der Bedarf an Ressourcen über die
-  Zeit zunimmt, oder sich je nach Saison, oder durch bestimmte Ereignisse
-  verändert, benötigen Sie das Vorausplanen, wie Sie skalieren. Das ist notwendig, um die Control-Plane 
+  Zeit zunimmt, oder sich je nach Saison oder durch bestimmte Ereignisse
+  verändert, benötigen Sie Vorausplanung, wie Sie skalieren. Das ist notwendig, um die Control-Plane 
   und Worker-Nodes zu entlasten, oder zum Runterskalieren von nicht benötigten Ressourcen.
 
 - *Sicherheit und Zugriffskontrolle*: Sie haben Vollzugriff auf Ihren eigenen
-  Cluster in einer Lernumgebung. Kubernetes Cluster mit mehr als ein, zwei Nutzern
+  Cluster in einer Lernumgebung. Kubernetes Cluster mit mehr als ein paar Nutzern
   und kritischen Workloads benötigen jedoch eine granulare Verwaltung "Wer" und "Was" Zugriff
   auf Ressourcen in Ihrem Cluster hat. Dafür stehen die role-based access control
   ([RBAC](/docs/reference/access-authn-authz/rbac/)) und weitere
-  Sicherheitsmechanismen zur Verfügung. Diese können Sie benutzen, um
+  Sicherheitsmechanismen zur Verfügung. Diese können Sie benutzen um
   sicher zu stellen, dass Nutzer und Workloads Zugriff auf die Ressourcen haben,
   die Sie benötigen. Gleichzeitig halten Sie damit ihre Workloads und Ihren
   Cluster selbst sicher. Sie können mit [policies](/docs/concepts/policy/) und 
@@ -66,13 +65,19 @@ Mögliche Optionen sind unter Anderem:
 
 - *Serverless*: Lassen Sie Ihre Worklodas auf vollständig verwalteter Hardware
   laufen. Ressourcen wie CPU Nutzung, Speichernutzung und Festplattenzugriffe
-  werden berechnet. Dabei müssen Sie keinerlei Clusterverwaltung betreiben.
+  werden abgerechnet. Dabei müssen Sie keinerlei Clusterverwaltung betreiben.
 - *Vollständig verwaltete Control-Plane*: Der Provider übernimmt die Skalierung
   und Verfügbarkeit der Control-Plane, sowie deren Updates und Upgrades.
+<!--
+TODO - From English bullet point for the next one
+- *Managed worker nodes*: Configure pools of nodes to meet your needs,
+  then the provider makes sure those nodes are available and ready to implement
+  upgrades when needed.
+
+Are we talking about K8s Upgrades or Node Pool Upgrades, e.g. provisioning more nodes
+-->
 - *Vollständig verwaltete Worker-Nodes*: Sie Konfigurieren Ihren Bedarf an
   Worker-Nodes. Der Provider übernimmt die Bereitstellung und Verfügbarkeit dieser.
-// TODO - and implement upgrades when needed - Are we talking about K8s Upgrades
-// or Node Pool Upgrades, e.g. provisioning more nodes
 - *Integriert*: Manche Anbieter integrieren Kubernetes mit anderen Diensten, die
   Sie möglicherweise benötigen. Darunter fallen zum Beispiel Speicher, Container 
   Registries, Authentifizierungsmethoden oder Entwicklungswerkzeuge.
@@ -84,56 +89,45 @@ in Ihrem Cluster zu bestimmen.
 
 ## Cluster Setup in einer Produktionsumgebung
 
-In a production-quality Kubernetes cluster, the control plane manages the
-cluster from services that can be spread across multiple computers
-in different ways. Each worker node, however, represents a single entity that
-is configured to run Kubernetes pods.
-
 In einem produktionsreifen Kubernetes Cluster übernimmt die Control-Plane die
-Verwaltung des Clusters mithilfe von Diensten, welche auf verschiedene Weise auf
-unterschiedlichen Computern verteilt sein könne. Dabei stellen Worker-Nodes
-jedoch Einheiten dar, welche konfiguriert sind Kubernetes Pods laufen zu lassen.
+Verwaltung des Clusters mithilfe von Diensten, welche auf verschiedene Arten
+über unterschiedlichen Computer verteilt sein können. Jeder Worker-Node stellt
+jedoch eine einzelne Entität dar, die zum Laufen lassen von Kubernetes Pods
+dient.
 
 ### Control-Plane in einer Produktionsumgebung
 
 Der minimalste Kubernetes Cluster hat die gesamten Control-Plane Dienste und
 Worker-Node Dienste auf derselben Maschine laufen. Dieses Setup können Sie
 erweitern, indem Sie Worker-Nodes hinzufügen, wie in dem Diagramm
-[Kubernetes Components](/docs/concepts/overview/components/) dargestellt. Falls
+[Kubernetes Komponenten](/docs/concepts/overview/components/) dargestellt. Falls
 der Cluster nur für einen kurzen Zeitraum benötigt wird, oder verworfen werden
-kann, falls etwas schief geht, kann dies das richtige Setup für Sie sein.
+kann, wenn etwas schief geht, kann dies das richtige Setup für Sie sein.
 
-If you need a more permanent, highly available cluster, however, you should
-consider ways of extending the control plane. By design, one-machine control
-plane services running on a single machine are not highly available.
-If keeping the cluster up and running
-and ensuring that it can be repaired if something goes wrong is important,
-consider these steps:
-
-Benötigen Sie jedoch einen dauerhaften, hoch verfügbaren Cluster, sollten Sie
+Benötigen Sie jedoch einen dauerhaften, hochverfügbaren Cluster, sollten Sie
 die Möglichkeiten die Control-Plane zu erweitern in Betracht ziehen. Die
 Control-Plane Dienste auf einer einzigen Maschine zu hosten ist systembedingt
-nicht hochverfügbar. Falls den Cluster verfügbar zu halten und sicherzustellen,
-dass Fehler automatisch repariert werden wichtig ist, beachten Sie die
+nicht hochverfügbar. Falls wichtig ist, den Cluster verfügbar zu halten und 
+sicherzustellen, dass Fehler automatisch repariert, beachten Sie die
 nachfolgenden Schritte:
 
 - *Wählen Sie Deployment Programme*: Sie können die Control-Plane mit Werkzeugen
   wie kubeadm, kops und kubespray aufsetzen. Sehen Sie in [Kubernetes mit
   Deployment Programmen installieren](/docs/setup/production-environment/tools/)
   nach, um Tipps für produktionsreife Deployments unter Benutzung dieser Programme
-  zu erhalten. Verschiedene [Container Runtimes](/docs/setup/production-environment/container-runtimes/) 
+  zu erhalten. Verschiedene [Container-Laufzeitumgebungen](/docs/setup/production-environment/container-runtimes/) 
   stehen Ihnen dabei zur Auswahl.
 - *Zertifikatverwaltung*: Die sichere Kommunikation ziwschen Diensten der
   Control-Plane wird durch Zertifikate garantiert. Diese werden automatisch
-  während des Deployments generiert, oder durch Ihre eigene Zertifizierungsstelle.
-  Siehe [PKI certificates and requirements](/docs/setup/best-practices/certificates/) für weitere Informationen.
+  während des Deployments generiert, oder durch Ihre eigene Zertifizierungsstelle bereitgestellt.
+  Siehe [PKI Zertifikate und Anforderungen](/docs/setup/best-practices/certificates/) für weitere Informationen.
 - *Loadbalancer für den API-Server*: Konfigureiren Sie einen Loadbalancer, um
   externe API requests zu den apiserver Diensten auf unterschiedliche Nodes zu
-  verteilen. Siehe [Create an External Load Balancer](/docs/tasks/access-application-cluster/create-external-load-balancer/).
+  verteilen. Siehe [Einen externen Load Balancer erstellen](/docs/tasks/access-application-cluster/create-external-load-balancer/).
 - *Separierung von Backup- und etcd Dienst*: Der etcd Dienst kann entweder auf
   den gleichen Maschinen wie die anderen Control-Plane Dienste laufen, oder auf
   davon verschiedenen Maschinen, um höhere Sicherheit und Verfügbarkeit zu
-  erzielen. Da der etcd Dienst Cluster Konfigurationsdaten speichert, sollten Sie
+  erzielen. Da der etcd Dienst die Cluster Konfigurationsdaten speichert, sollten Sie
   die ectd Datenbank regelmäßig sichern, um diese bei Bedarf reparieren zu
   könnnen. Schauen Sie im [etcd FAQ](https://etcd.io/docs/v3.5/faq/) für Details
   zur Konfigurierung von etcd nach. In 
@@ -142,7 +136,7 @@ nachfolgenden Schritte:
 - *Erstellen mehrere Control-Plane Systeme*: Um hohe Verfügbarkeit zu erzielen,
   sollte die Control-Plane auf mehr als einer einzelnen Maschine laufen. Falls
   die Control-Plane Dienste durch einen Initialisierungsdienst (wie systemd)
-  laufen, sollte jeder Dienst auf mindestens drei Maschinen laufen. Alternativ kann
+  laufen, sollte jeder Dienst auf mindestens drei Maschinen repliziert werden. Alternativ kann
   das Laufenlassen der Control-Plane Dienste als Kubernetes Pods sicherstellen, dass
   Ihre angefragte Anzahl der Replikas stets verfügbar ist.
   Der Scheduler sollte fehlertolerant sein, muss jedoch nicht hochverfügbar
@@ -151,58 +145,47 @@ nachfolgenden Schritte:
   gewählte Leader wegfällt, wählt ein anderer Dienst sich selbst und übernimmt.
 - *Verteilung über mehrere Zonen*: Falls Ihr Cluster unbedingt immer verfügbar
   sein muss, sollten Sie in Betracht ziehen, diesen in mehreren Datenzentren zu
-  verteilen, welche im Cloud Computing als Zonen genannt werden.
+  verteilen, welche im Cloud Computing Zonen genannt werden.
   Zusammenschlüsse von Zonen bezeichnet man als Regionen. Durch die Verteilung von
   Clustern über mehrere Zonen in der gleichen Region werden die Chancen erhöht,
   dass Ihr Cluster verfügbar bleibt, sofern eine Zone ausfällt. Sehen Sie auch 
-  [Operieren in mehreren Zonen](/docs/setup/best-practices/multiple-zones/) für
+  [Betreiben in mehreren Zonen](/docs/setup/best-practices/multiple-zones/) für
   weitere Informationen.
 - *Anfallende Aufgaben*: Falls Sie planen Ihren Cluster für längere Zeit zu
   behalten, fallen verschiedene Aufgaben an, um den Zustand und die Sicherheit des
   Clusters zu gewährleisten. Sollten Sie zum Beispiel Ihren Cluster mit kubeadm
-  installiert haben, finden Sie hier Anlteitungen zur 
+  installiert haben, finden Sie hier Anleitungen zur 
   [Zertifikatverwaltung](/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/)
   und zum [kubeadm Cluster upgraden](/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/).
 
-To learn about available options when you run control plane services, see
-[Options for Highly Available topology](/docs/setup/production-environment/tools/kubeadm/ha-topology/),
-[Creating Highly Available clusters with kubeadm](/docs/setup/production-environment/tools/kubeadm/high-availability/),
-and [Operating etcd clusters for Kubernetes](/docs/tasks/administer-cluster/configure-upgrade-etcd/).
-See [Backing up an etcd cluster](/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster)
-for information on making an etcd backup plan.
-
-???? Next is ... I had a hard time translating, TODO
-
-Um die Möglichkeiten für Control-Plane Dienste zu sehen, siehe
-[kube-apiserver](/docs/reference/command-line-tools-reference/kube-apiserver/),
+Um mehr über die Möglichkeiten zu lernen, Control Plane Dienste zu betreiben,
+Siehe die Komponentenseiten für [kube-apiserver](/docs/reference/command-line-tools-reference/kube-apiserver/),
 [kube-controller-manager](/docs/reference/command-line-tools-reference/kube-controller-manager/),
 und [kube-scheduler](/docs/reference/command-line-tools-reference/kube-scheduler/)
-Komponentenseiten. Für hochverfügbare Control-Plane Beispiele, sehen Sie in 
-[Hochverfügbare Cluster mit kubeadm erstellen](/docs/setup/production-environment/tools/kubeadm/high-availability/),
-und [etcd Cluster für Kubernetes verwalten](/docs/tasks/administer-cluster/configure-upgrade-etcd/) nach.
-Lesn Sie [Backup eines etcd Clustes erstellen](/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster)
-für mehr Informationen über einen etcd Backup Plan.
+Für hochverfügbare Control-Plane Beispiele, lesen Sie
+[Hochverfügbare Cluster mit kubeadm erstellen](/docs/setup/production-environment/tools/kubeadm/high-availability/)
+und [etcd Cluster für Kubernetes verwalten](/docs/tasks/administer-cluster/configure-upgrade-etcd/).
+In [Backup eines etcd Clustes erstellen](/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster)
+finden Sie mehr Informationen für einen etcd Backup Plan.
 
-### Worker-Nodes in einer Produktionsumgebung
 ### Produktionsreife Worker-Nodes
-### Production worker nodes
 
 Produktionsreife Workloads müssen resilient sein, und ihre Abhängigkeiten
 ebenfalls (wie z. B. CoreDNS). Unabhängig davon ob Sie Ihre Control-Plane selbst
-verwalten, oder dies einem Cloud Anbieter überlassen, müssen Sie in Betracht
+verwalten, oder dies einem Cloud Anbieter überlassen, müssen Sie dennoch in Betracht
 ziehen, wie Sie ihre Worker-Nodes verwalten (diese werden oft kürzer als *nodes*
 referenziert). 
 
 - *Nodes konfigurieren*: Nodes können physische oder virtuelle Maschinen sein.
-Falls Sie Ihre eigenen Nodes erstellen und verwalten wollen, können Sie ein
-unterstütztes Betriebssystem installieren und die korrekten 
-[Node Dienste](./docs/concepts/architecture/#node-components) ausführen.
-Beachten Sie:
-  - Die Anforderungen Ihrer Workloads beim Aufsetzen Ihrer Nodes, sodass diese
-  die korrekten CPU, Speicher, Festplattengeschwindigkeit sowie -kapazität
-  haben. 
+  Falls Sie Ihre eigenen Nodes erstellen und verwalten wollen, können Sie ein
+  unterstütztes Betriebssystem installieren und die korrekten 
+  [Node Dienste](./docs/concepts/architecture/#node-components) ausführen.
+  Beachten Sie:
+  - Die Anforderungen Ihrer Workloads beim Aufsetzen Ihrer Nodes an Ressourcen, 
+    sodass diese die korrekten CPU, Speicher, Festplattengeschwindigkeit sowie 
+    -kapazität haben. 
   - Ob generische Computersysteme ausreichen, oder Sie Workloads haben, welche
-  GPUs, Windows Nodes oder VM Isolation benötigen.
+    GPUs, Windows Nodes oder VM Isolation benötigen.
 - *Nodes validieren*: Sehen Sie unter [Korrektes Node Setup](/docs/setup/best-practices/node-conformance/)
   für Informationen zur Sicherstellung, dass Ihre Nodes die Anforderungen für
   einen Beitritt zum Cluster erfüllen, nach.
@@ -210,50 +193,52 @@ Beachten Sie:
   können Sie Nodes hinzufügen, indem Sie Ihre eigenen Maschinen aufsetzen und
   diese entweder manuell hinzufügen, oder sich selbst am API Server des Clusters
   registrieren lassen. Lesen Sie dafür in dem Abschnitt [Nodes](/docs/concepts/architecture/nodes/)
-  nach, wie Sie Kubernetes aufsetzen, um Nodes in den vorangegangen Möglichkeiten
+  nach, wie Sie Kubernetes aufsetzen, um Nodes nach den vorangegangen Möglichkeiten
   hinzuzufügen.
-- *Nodes skalieren*: Halten Sie einen Plan bereit, die Kapazität des Clusters zu
-  erweitern. Sehen Sie in [TODO Considerations for large clusters](/docs/setup/best-practices/cluster-large/)
+- *Nodes skalieren*: Halten Sie einen Plan bereit wie Sie die Kapazität des Clusters
+  erweitern. Sehen Sie in [Betrachtungen für große Cluster](/docs/setup/best-practices/cluster-large/)
   nach, um herauszufinden wie viele Nodes Sie benötigen, basierend auf der
   Anzahl der Pods und Container die laufen. Falls Sie Ihre Nodes selbst verwalten,
-  kann dies den Kauf und die Installation Ihrer eigenen Hardware umfassen.
-- *Knoten automatisch skalieren*: Lesen Sie [Node Autoscaling](/docs/concepts/cluster-administration/node-autoscaling)
-  um über die Tools zu erfahren, welche Ihnen die Möglichkeit zur
-  Automatisierung Ihrer Knoten und derer Kapazitäten bieten. 
+  kann dies den Kauf und die Installation Ihrer eigenen Hardware beinhalten.
+- *Nodes automatisch skalieren*: Lesen Sie [Node Autoskalierung](/docs/concepts/cluster-administration/node-autoscaling)
+  um über die Tools zu lernen, welche Ihnen die Möglichkeit zur
+  Automatisierung Ihrer Nodes und derer Kapazitäten bieten. 
 - *Setzen Sie Node Health Checks auf*: Für kritische Workloads wollen Sie
-  sicherstellen, dass die Nodes und Pods gesund sind. Wenn Sie den [Node Problem
-  Detector](...) daemon nutzen, können Sie die die Gesundheit Ihrer Nodes
+  sicherstellen, dass die Nodes und Pods gesund sind. Wenn Sie den
+  [Node Problem Detector](/docs/tasks/debug/debug-cluster/monitor-node-health/)
+  daemon nutzen, können Sie die die Gesundheit Ihrer Nodes
   sicherstellen.
 
 ## Nutzerverwaltung in Produktionsumgebungen
 
 In einer Produktionsumgebung wechseln Sie möglicherweise von einem Modell,
-in dem nur Sie oder eine kleine Gruppe von Personen auf den Cluster zugreifen,
+in dem nur Sie oder eine kleine Gruppe von Personen auf den Cluster zugreifen
 hin zu einem Szenario, in dem potenziell Dutzende oder Hunderte von Personen Zugriff haben.
 Für eine Lernumgebung oder einen Plattform Prototypen haben Sie unter Umständen
-einen einzigen Administrator Benutzer, welcher Vollzugriff hat. Für Ihre
+einen einzigen Administrator Benutzer, welcher Vollzugriff hat. In Ihrer
 Produktwivumgebung werden Sie mehr Benutzer mit unterschiedlichen Zugriffsleveln
 haben wollen.
 
 Einen produktionsreifen Cluster zu betreiben heißt, selektiv Zugriff auf den
 Cluster durch weitere Nutzer zuzulassen. Im Detail bedeutet dies, dass Sie
-die Strategie wählen müssen, für jene, die auf Ihren Cluster zugreifen wollen
+die Strategie wählen müssen für Jene, die auf Ihren Cluster zugreifen wollen
 (Authentifizierung), und ob diese das Recht haben, auf angefragte Ressourcen
 zuzugreifen (Autorisierung).
 
 - *Authentifizierung*: Der API-Server kann Clients mithilfe von Zertifikaten,
   Bearer-Tokens, einem Authentifizierungsproxy oder HTTP Basic Auth
-  authentifizieren. Sie können die Methoden wählen. Mithilfe von Plugins kann
-  der API-Server bestehende Authentifizerungsmethoden Ihrer Organization nutzen,
-  wie zum Beispiel LDAP oder Kerberos. Schauen Sie in 
-  [Authentication](/docs/reference/access-authn-authz/authentication/) für eine
+  authentifizieren. Sie können die Methoden wählen, welche Sie zur
+  Authentifizierung einsetzen möchten. Mithilfe von Plugins kann
+  der API-Server bestehende Authentifizerungsmethoden Ihrer Organization
+  verwenden, wie zum Beispiel LDAP oder Kerberos. Schauen Sie in 
+  [Authentifizierung](/docs/reference/access-authn-authz/authentication/) für eine
   Beschreibung der verschiedenen Methoden zur Authentizifierung von Kubernetes
-  Nutzern.
+  Nutzern nach.
 - *Autorisierung*: Falls Sie darauf abzielen, ihre normalen Nutzer zu
   autorisieren, werden Sie wahrscheinlich zwischen RBAC und ABAC Autorisierung wählen.
   Sehen sie in der [Übersicht zur Autorisierung](/docs/reference/access-authn-authz/authorization/)
   die unterschiedlichen Modi zur Autorisierung von Nutzerkonten durch (als auch von Service Account
-  Zugriff auf Ihren Cluster):
+  Zugriff für Ihren Cluster):
   - *Rolenbasierte Zugriffskontrolle* ([RBAC](/docs/reference/access-authn-authz/rbac/)) 
     lässt Sie Clusterzugriff durch die Freigabe bestimmter Rechte an
     authentifizerte Nutzer verwalten. Rechte können für einen bestimmten
@@ -261,69 +246,64 @@ zuzugreifen (Autorisierung).
     werden. Durch die Nutzung von RoleBindings und ClusterRoleBindings können
     diese an bestimmte Nutzer vergeben werden.
   - *Attributbasierte Zugriffkontrolle* ([ABAC](/docs/reference/access-authn-authz/abac/)) 
-    lässt sie Richtlinien anhand der Attribute von Ressourcen erstellen, und
+    lässt sie Richtlinien anhand der Attribute von Ressourcen erstellen und
     erlaubt oder verweigert Zugriff basierend auf diesen Attributen. Jede Zeile
     einer Policy-Datei beinhaltet Versionsinformationen (apiVersion und kind),
-    sowie eine Map von spec-Eigenschaften, um das Subject (Nutzer oder Gruppe), 
+    sowie eine Map von spec-Eigenschaften, um das Subjekt (Nutzer oder Gruppe), 
     Ressourcen Eigenschaften, nicht-Ressourcen Eigenschaften (/version oder /api) und
     die Eigenschaft readonly zu verbinden. Sehen Sie in den 
-    [Beispielen](/docs/reference/access-authn-authz/abac/#examples) für die Details nach. 
+    [Beispielen](/docs/reference/access-authn-authz/abac/#examples) für Details nach. 
 
 Als Jemand, der einen produktionsreifen Kubernetes Cluster aufsetzt, sollten Sie
 einige Dinge beachten:
 
-- *Setzen Sie den Autorisierungsmodus*: Sobald der Kubernetes API-Server startet,
-  müssen unterstützte Autorisierungsmodi gesetzt sein, entweder durch eine
+- *Setzen Sie den Autorisierungsmodus*: Sobald der Kubernetes API-Server 
+  ([kube-apiserver](/docs/reference/command-line-tools-reference/kube-apiserver/))
+  startet müssen unterstützte Autorisierungsmodi gesetzt sein, entweder durch eine
   *--authorization-config* Datei oder ein *--authorization-mode* Flag. Zum
-  Beispiel können Sie das Flag in *kube-adminserver.yaml* (in
-  */etc/kubernetes/manifests*) zu Node,RBAC setzen, was Node und RBAC
+  Beispiel können Sie das Flag in der *kube-adminserver.yaml* (in
+  */etc/kubernetes/manifests*) Datei zu Node,RBAC setzen, was Node und RBAC
   Autorisierungsanfragen für authentifizierte Anfragen erlabut.
 - *Erstellen Sie Nutzerzertifikate und Role Bindings (RBAC)*: Wenn Sie RBAC
   Autorisierung nutzen, können Nutzer eine CertificateSigningRequest (CSR)
-  erstellen, das von der Cluster CA signiert werden kann. Daraufhin können Role und
-  ClusterRole an an jeden Nutzer gebunden werden. 
+  erstellen, das von der Cluster Zertifizierungsstelle signiert werden kann.
+  Daraufhin können Role und ClusterRole an jeden Nutzer gebunden werden. 
   Die Details finden Sie in 
-  [Certificate Signing Requests](/docs/reference/access-authn-authz/certificate-signing-requests/)
-- *Erstellen Sie Richtlinien die Attribute vereinen (ABAC)*: Falls Sie ABAC
+  [Zertifikatsignierungsanfragen](/docs/reference/access-authn-authz/certificate-signing-requests/)
+- *Erstellen Sie Richtlinien, die Attribute vereinen (ABAC)*: Falls Sie ABAC
   Autorisierung nutzen, können Sie Kombinationen von Attributen zu Richtlinien
   vereinen, sodass ausgewählte Gruppen oder Nutzer für Zugriff auf bestimmte
   Ressourcen (wie z. B. Pod), Namespaces oder API Gruppen autorisiert werden. 
   Mehr dazu finden Sie in den [Beispielen](/docs/reference/access-authn-authz/abac/#examples).
-TODO
 - *Ziehen Sie Admission Controller in Betracht*: Zusätzliche Methoden zur
   Autorisierung von Anfragen, die durch den API-Server eingehen, beinhalten
-  [Webhook Token Authentication](/docs/reference/access-authn-authz/authentication/#webhook-token-authentication).
+  [Webhook Token Authentifizierung](/docs/reference/access-authn-authz/authentication/#webhook-token-authentication).
   Webhooks und weitere spezielle Autorisierungstypen müssen aktiviert werden durch
   [Admission Controller](/docs/reference/access-authn-authz/admission-controllers/)
 
-## Set limits on workload resources
 ## Setzen von Limits für Workloads 
 
 Anforderungen von Workloads in der Produktion kann Systemlast sowohl in als auch
 außerhalb der Kubernetes Control-Plane erzeugen. Beachten Sie diese Punkte beim
-Aufsetzen Ihres Clusters zum Erfüllen der Anforderungen der Workloads:
+Aufsetzen Ihres Clusters zum Erfüllen der Anforderungen Ihrer Workloads:
 
 - *Setzen Sie namespace limits*: Setzen Sie pro-namespace Kontingente für
   Ressourcen wie Arbeitsspeicher und CPU. Unter [Verwalten von Speicher, CPU und
   API Ressourcen](./docs/tasks/administer-cluster/manage-resources) finden Sie mehr dazu.
 - *Vorbereiten für DNS Anforderungen*: Falls Sie planen Ihre Worklodas massiv zu
   skalieren, muss Ihr DNS Service auch für diese Skalierbarkeit bereit sein. Für
-  mehr, lesen Sie in 
+  mehr, lesen Sie 
   [DNS Service automatisch in einem Cluster skalieren](/docs/tasks/administer-cluster/dns-horizontal-autoscaling/).
 - *Erstellen Sie zusätzliche Service Accounts*: Nutzeraccounts definieren, was
   Nutzer in einem Cluster tun können, wogegen Service Accounts zur Definition von
   Zugrifssrechten der Pods in einem Namespace genutzt werden. Standardmäßig nimmt
   ein Pod den Standard Service Account seines Namespaces an. Für mehr
-  Informationen zum Erstellen eines neuen Service Accounts, lesen Sie [Verwalten
+  Informationen zum Erstellen eines neuen Service Accounts, siehe [Verwalten
   von Service Accounts](/docs/reference/access-authn-authz/service-accounts-admin/). 
-  Beispielsweise könnten Sie:
-  - Add secrets that a pod could use to pull images from a particular container registry. See
-    [Configure Service Accounts for Pods]()
-    for an example.
+  Beispielsweise können Sie:
   - Secrets hinzufügen, sodass ein Pod sein Image von einer bestimmten Container
-    Registry pullen kann. Sehen Sie dazu in [Verwalten von Service Accounts für
-    Pods](/docs/tasks/configure-pod-container/configure-service-account/) für ein
-    Beispiel nach.
+    Registry pullen kann. Für ein Beispiel sehen Sie in [Verwalten von Service Accounts für
+    Pods](/docs/tasks/configure-pod-container/configure-service-account/) nach.
   - RBAC Rechte an einen Service Account binden. Details finden Sie in
     [ServiceAccount Rechte](/docs/reference/access-authn-authz/rbac/#service-account-permissions).
 
@@ -333,8 +313,8 @@ Aufsetzen Ihres Clusters zum Erfüllen der Anforderungen der Workloads:
   oder einen von verfügbaren [Turnkey Cloud Solutions](/docs/setup/production-environment/turnkey-solutions/)
   oder [Kubernetes Partnern](/partners) erhalten wollen.
 - Falls Sie Ihren eigenen Cluster erstellen, planen Sie wie sie 
-  [Zertifikiate](/docs/setup/best-practices/certificates/)
-  verwalten, und hohe Verfügbarkeit für Features wie 
+  [Zertifikate](/docs/setup/best-practices/certificates/)
+  verwalten sowie hohe Verfügbarkeit für Features wie 
   [etcd](/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/)
   und den 
   [API server](/docs/setup/production-environment/tools/kubeadm/ha-topology/).
